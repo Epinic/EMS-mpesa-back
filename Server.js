@@ -4,14 +4,13 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
 
-// === CONFIGURE YOUR KEYS ===
+// Daraja sandbox keys
 const consumerKey = 'YOUR_CONSUMER_KEY';
 const consumerSecret = 'YOUR_CONSUMER_SECRET';
 const shortcode = 'YOUR_SHORTCODE';
 const passkey = 'YOUR_PASSKEY';
-const callbackURL = 'https://your-render-app.onrender.com/callback';
+const callbackURL = 'https://your-railway-app.up.railway.app/callback';
 
-// === GET OAUTH TOKEN ===
 async function getToken() {
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
     const res = await axios.get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
@@ -20,7 +19,6 @@ async function getToken() {
     return res.data.access_token;
 }
 
-// === STK PUSH ENDPOINT ===
 app.post('/stkpush', async (req, res) => {
     const { phone, amount, accountReference, transactionDesc } = req.body;
     const token = await getToken();
@@ -51,12 +49,10 @@ app.post('/stkpush', async (req, res) => {
     }
 });
 
-// === CALLBACK ENDPOINT ===
 app.post('/callback', (req, res) => {
     console.log('Payment callback received:', req.body);
     res.sendStatus(200);
 });
 
-// === START SERVER ===
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
